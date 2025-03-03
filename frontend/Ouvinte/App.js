@@ -5,22 +5,32 @@ import { styles } from './src/Styles/styles';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Image style={styles.img} source={require('./src/img/OvF.png')}/>
+      <Image style={styles.img} source={require('./src/img/OvF.png')} />
 
-      <Text style= {styles.title}>Bem Vindo</Text>
+      <Text style={styles.title}>Bem Vindo</Text>
 
       <StatusBar style="auto" />
 
-      <TextInput style={styles.formInput}></TextInput>
-      <TextInput style={styles.formInput}></TextInput>
+      <TextInput style={styles.formInput}
+        placeholder="Informe o E-mail"
+        keyboardType="email-address"
+        autoCapitalize="nome"
+        autoComplete="email">
+      </TextInput>
+
+      <TextInput style={styles.formInput}
+        placeholder="Informe a Senha"
+        autoCapitalize="nome"
+        secureTextEntry>
+      </TextInput>
 
       <View style={styles.subContainer}>
-      <Pressable>
-      <Text style={styles.subText}>Esqueci a senha</Text>
-      </Pressable>
-      <Pressable>
-        <Text style={styles.subText}>Novo usuário</Text>
-      </Pressable>
+        <Pressable>
+          <Text style={styles.subText}>Esqueci a senha</Text>
+        </Pressable>
+        <Pressable>
+          <Text style={styles.subText}>Novo usuário</Text>
+        </Pressable>
       </View>
 
       <Pressable style={styles.formButton}>

@@ -16,13 +16,13 @@ export const styles = StyleSheet.create ({
     title:{
         fontSize:30,
         padding:10,
-        
+        fontWeight: 'bold',       
     },  
     formInput:{
         backgroundColor:'#A7E7BD',
         borderWidth:1,
         borderRadius: 14,
-        fontSize:24,
+        fontSize:16,
         width:'80%',
         padding:10,
         margin:10,
@@ -41,7 +41,6 @@ export const styles = StyleSheet.create ({
     textButton:{
         fontSize:24,
         color: 'black',
-        fontWeight: 'bold',
     },  
 
     subContainer:{
