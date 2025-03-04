@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Pressable, Text, TextInput, View, Image } from 'react-native';
-import { styles } from './src/Styles/styles';
+import { styles } from '../src/Styles/styles';
+import { Link } from 'expo-router';
 
-export default function App() {
+export default function Login() {
   return (
     <View style={styles.container}>
-      <Image style={styles.img} source={require('./src/img/OvF.png')} />
 
       <Text style={styles.title}>Bem Vindo</Text>
 
@@ -29,7 +29,7 @@ export default function App() {
           <Text style={styles.subText}>Esqueci a senha</Text>
         </Pressable>
         <Pressable>
-          <Text style={styles.subText}>Novo usuário</Text>
+          <Link href="/Cadastro" style={styles.subText}>Novo usuário</Link>
         </Pressable>
       </View>
 
@@ -39,4 +39,3 @@ export default function App() {
     </View>
   );
 }
-
