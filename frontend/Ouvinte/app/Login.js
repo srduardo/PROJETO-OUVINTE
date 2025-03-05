@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Pressable, Text, TextInput, View, Image } from 'react-native';
+import { Pressable, Text, TextInput, View, Image } from 'react-native';
 import { styles } from '../src/Styles/styles';
 import { Link } from 'expo-router';
 
@@ -26,8 +26,9 @@ export default function Login() {
 
       <View style={styles.subContainer}>
         <Pressable>
-          <Text style={styles.subText}>Esqueci a senha</Text>
+          <Link href="/Esquecido" style={styles.subText}>Esqueci a senha</Link>
         </Pressable>
+
         <Pressable>
           <Link href="/Cadastro" style={styles.subText}>Novo usuário</Link>
         </Pressable>
