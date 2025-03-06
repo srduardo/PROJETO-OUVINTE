@@ -1,7 +1,8 @@
 package com.ouvinte.backend.services;
 
 import com.ouvinte.backend.domain.User;
-import com.ouvinte.backend.dto.UserDto;
+import com.ouvinte.backend.dto.request.UserRequestDto;
+import com.ouvinte.backend.dto.response.UserResponseDto;
 import com.ouvinte.backend.exceptions.InvalidCredentialsException;
 import com.ouvinte.backend.exceptions.UserNotFoundException;
 import com.ouvinte.backend.repositories.UserRepository;
@@ -15,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -35,62 +35,49 @@ public class UserService {
 
     // Interaction operations with databases:
 
-    public List<UserDto> findAllUsers() {
+    public List<UserResponseDto> findAllUsers() {
         return userRepository
                 .findAll()
                 .stream()
-                .map(user -> new UserDto(user.getUsername(), user.getEmail(), user.getPassword()))
+                .map(user -> new UserResponseDto(user.getId(), user.getUsername(), user.getEmail()))
                 .toList();
     }
 
-    public UserDto findUserById(Integer id) throws RuntimeException {
-        Optional<User> user = userRepository.findById(id);
+    public UserResponseDto findUserById(Integer id) throws UserNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
-        if (user.isEmpty()) {
-            throw new RuntimeException("Usuário não encontrado.");
-        }
-
-        return new UserDto(user.get().getUsername(), user.get().getEmail(), user.get().getPassword());
+        return new UserResponseDto(user.getId(), user.getUsername(), user.getEmail());
     }
 
-    public void deleteUserById(Integer id) throws RuntimeException {
-        Optional<User> user = userRepository.findById(id);
+    public void deleteUserById(Integer id) throws UserNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
-        if (user.isEmpty()) {
-            throw new RuntimeException("Usuário não encontrado.");
-        }
-
-        userRepository.delete(user.get());
+        userRepository.delete(user);
     }
 
-    public UserDto updateUserById(Integer id, UserDto userDto) throws RuntimeException {
-        Optional<User> oldUser = userRepository.findById(id);
+    public UserResponseDto updateUserById(Integer id, UserRequestDto userDto) throws UserNotFoundException {
+        User updatedUser = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
-        if (oldUser.isEmpty()) {
-            throw new RuntimeException("Usuário não encontrado");
-        }
-
-        User updatedUser = oldUser.get();
         BeanUtils.copyProperties(userDto, updatedUser);
         updatedUser.setPassword(encoderPassword.encode(updatedUser.getPassword()));
         userRepository.save(updatedUser);
 
-        return userDto;
+        return new UserResponseDto(updatedUser.getId(),updatedUser.getUsername(), updatedUser.getEmail());
     }
 
     // Authentication operations:
 
-    public String verify(UserDto userDto) throws BadCredentialsException {
+    public String verify(UserRequestDto userDto) throws BadCredentialsException {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
 
-        if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(userDto.getEmail());
+        if (!authentication.isAuthenticated()) {
+            throw new BadCredentialsException("Autenticação inválida");
         }
 
-        return "Fail...";
+        return jwtService.generateToken(userDto.getEmail());
     }
 
-    public void registerUser(UserDto userDto) throws RuntimeException{
+    public void registerUser(UserRequestDto userDto) throws RuntimeException{
         if (userDto == null || verifyIfEmailUserExists(userRepository.findAllUserEmails(), userDto)) {
             throw new InvalidCredentialsException();
         }
@@ -101,7 +88,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public boolean verifyIfEmailUserExists(List<String> emails, UserDto userDto) {
+    public boolean verifyIfEmailUserExists(List<String> emails, UserRequestDto userDto) {
         Collections.sort(emails);
         return Collections.binarySearch(emails, userDto.getEmail()) > -1;
     }
