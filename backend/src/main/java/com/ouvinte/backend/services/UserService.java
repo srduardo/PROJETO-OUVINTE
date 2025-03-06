@@ -1,9 +1,9 @@
 package com.ouvinte.backend.services;
 
 import com.ouvinte.backend.domain.User;
-import com.ouvinte.backend.dto.UserDto;
+import com.ouvinte.backend.dto.request.UserRequestDto;
+import com.ouvinte.backend.dto.response.UserResponseDto;
 import com.ouvinte.backend.exceptions.InvalidCredentialsException;
-import com.ouvinte.backend.exceptions.UserNotFoundException;
 import com.ouvinte.backend.repositories.UserRepository;
 import com.ouvinte.backend.services.security.JwtService;
 import org.springframework.beans.BeanUtils;
@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -35,22 +34,22 @@ public class UserService {
 
     // Interaction operations with databases:
 
-    public List<UserDto> findAllUsers() {
+    public List<UserResponseDto> findAllUsers() {
         return userRepository
                 .findAll()
                 .stream()
-                .map(user -> new UserDto(user.getUsername(), user.getEmail(), user.getPassword()))
+                .map(user -> new UserResponseDto(user.getId(), user.getUsername(), user.getEmail()))
                 .toList();
     }
 
-    public UserDto findUserById(Integer id) throws RuntimeException {
+    public UserResponseDto findUserById(Integer id) throws RuntimeException {
         Optional<User> user = userRepository.findById(id);
 
         if (user.isEmpty()) {
             throw new RuntimeException("Usuário não encontrado.");
         }
 
-        return new UserDto(user.get().getUsername(), user.get().getEmail(), user.get().getPassword());
+        return new UserResponseDto(user.get().getId(), user.get().getUsername(), user.get().getEmail());
     }
 
     public void deleteUserById(Integer id) throws RuntimeException {
@@ -63,7 +62,7 @@ public class UserService {
         userRepository.delete(user.get());
     }
 
-    public UserDto updateUserById(Integer id, UserDto userDto) throws RuntimeException {
+    public UserResponseDto updateUserById(Integer id, UserRequestDto userDto) throws RuntimeException {
         Optional<User> oldUser = userRepository.findById(id);
 
         if (oldUser.isEmpty()) {
@@ -75,22 +74,22 @@ public class UserService {
         updatedUser.setPassword(encoderPassword.encode(updatedUser.getPassword()));
         userRepository.save(updatedUser);
 
-        return userDto;
+        return new UserResponseDto(updatedUser.getId(),updatedUser.getUsername(), updatedUser.getEmail());
     }
 
     // Authentication operations:
 
-    public String verify(UserDto userDto) throws BadCredentialsException {
+    public String verify(UserRequestDto userDto) throws BadCredentialsException {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
 
-        if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(userDto.getEmail());
+        if (!authentication.isAuthenticated()) {
+            throw new BadCredentialsException("Autenticação inválida");
         }
 
-        return "Fail...";
+        return jwtService.generateToken(userDto.getEmail());
     }
 
-    public void registerUser(UserDto userDto) throws RuntimeException{
+    public void registerUser(UserRequestDto userDto) throws RuntimeException{
         if (userDto == null || verifyIfEmailUserExists(userRepository.findAllUserEmails(), userDto)) {
             throw new InvalidCredentialsException();
         }
@@ -101,7 +100,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public boolean verifyIfEmailUserExists(List<String> emails, UserDto userDto) {
+    public boolean verifyIfEmailUserExists(List<String> emails, UserRequestDto userDto) {
         Collections.sort(emails);
         return Collections.binarySearch(emails, userDto.getEmail()) > -1;
     }

@@ -1,7 +1,7 @@
 package com.ouvinte.backend.controllers;
 
-import com.ouvinte.backend.domain.User;
-import com.ouvinte.backend.dto.UserDto;
+import com.ouvinte.backend.dto.request.UserRequestDto;
+import com.ouvinte.backend.dto.response.UserResponseDto;
 import com.ouvinte.backend.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +21,12 @@ public class UserController {
     // Authentication endpoints:
 
     @PostMapping("/login")
-    public String loginUser(@Valid @RequestBody UserDto userDto) {
-        return userService.verify(userDto);
+    public ResponseEntity<String> loginUser(@Valid @RequestBody UserRequestDto userDto) {
+        return ResponseEntity.ok(userService.verify(userDto));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<UserRequestDto> registerUser(@Valid @RequestBody UserRequestDto userDto) {
         userService.registerUser(userDto);
         return ResponseEntity.status(201).body(userDto);
     }
@@ -34,25 +34,25 @@ public class UserController {
     // CRUD endpoints:
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable Integer id) {
+    public ResponseEntity<UserResponseDto> getUser(@PathVariable Integer id) {
         return ResponseEntity.ok(userService.findUserById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> users = userService.findAllUsers();
-        return ResponseEntity.status(200).body(users);
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        List<UserResponseDto> users = userService.findAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserDto> deleteUserByUsername(@PathVariable Integer id){
-        UserDto userDto = userService.findUserById(id);
+    public ResponseEntity<UserResponseDto> deleteUserByUsername(@PathVariable Integer id){
+        UserResponseDto userDto = userService.findUserById(id);
         userService.deleteUserById(id);
         return ResponseEntity.ok(userDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Integer id, @RequestBody UserDto userDto){
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Integer id, @RequestBody UserRequestDto userDto){
         return ResponseEntity.ok(userService.updateUserById(id, userDto));
     }
 }

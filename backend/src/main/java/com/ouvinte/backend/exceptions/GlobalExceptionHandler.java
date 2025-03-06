@@ -1,22 +1,46 @@
 package com.ouvinte.backend.exceptions;
 
-import org.springframework.http.HttpEntity;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({InvalidCredentialsException.class})
-    public ResponseEntity<ErrorResponse> handleInvalidCredentialsException(InvalidCredentialsException exception) {
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), exception.getMessage(), LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    private final MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter;
+
+    public GlobalExceptionHandler(MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {
+        this.mappingJackson2HttpMessageConverter = mappingJackson2HttpMessageConverter;
+    }
+
+    @ExceptionHandler({ InvalidCredentialsException.class })
+    public ResponseEntity<ResponseError> handleInvalidCredentialsException(
+            Exception ex, WebRequest request) {
+
+        return new ResponseEntity<>(
+                new ResponseError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), LocalDateTime.now()),
+                new HttpHeaders(),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    @ExceptionHandler({ AuthenticationException.class })
+    public ResponseEntity<ResponseError> handleAuthenticationException(
+            Exception ex, WebRequest request) {
+
+        return new ResponseEntity<ResponseError>(
+                new ResponseError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), LocalDateTime.now()),
+                new HttpHeaders(),
+                HttpStatus.UNAUTHORIZED
+        );
     }
 
 }
