@@ -33,12 +33,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = null;
         String email = null;
-//        String requestPath = request.getRequestURI();
-//
-//        if (requestPath.contains("/api/users/register") || requestPath.contains("/api/users/login")) {
-//            filterChain.doFilter(request, response); // Libera o fluxo sem validar token
-//            return;
-//        }
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
