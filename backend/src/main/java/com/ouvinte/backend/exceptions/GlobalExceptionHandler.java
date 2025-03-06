@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({ InvalidCredentialsException.class })
     public ResponseEntity<ResponseError> handleInvalidCredentialsException(
             Exception ex, WebRequest request) {
-
+        
         return new ResponseEntity<>(
                 new ResponseError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), LocalDateTime.now()),
                 new HttpHeaders(),
@@ -40,6 +40,17 @@ public class GlobalExceptionHandler {
                 new ResponseError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), LocalDateTime.now()),
                 new HttpHeaders(),
                 HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    @ExceptionHandler({ UserNotFoundException.class })
+    public ResponseEntity<ResponseError> handleUserNotFoundException(
+            Exception ex, WebRequest request) {
+
+        return new ResponseEntity<ResponseError>(
+                new ResponseError(HttpStatus.NOT_FOUND.value(), ex.getMessage(), LocalDateTime.now()),
+                new HttpHeaders(),
+                HttpStatus.NOT_FOUND
         );
     }
 

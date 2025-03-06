@@ -4,6 +4,7 @@ import com.ouvinte.backend.domain.User;
 import com.ouvinte.backend.dto.request.UserRequestDto;
 import com.ouvinte.backend.dto.response.UserResponseDto;
 import com.ouvinte.backend.exceptions.InvalidCredentialsException;
+import com.ouvinte.backend.exceptions.UserNotFoundException;
 import com.ouvinte.backend.repositories.UserRepository;
 import com.ouvinte.backend.services.security.JwtService;
 import org.springframework.beans.BeanUtils;
@@ -42,34 +43,21 @@ public class UserService {
                 .toList();
     }
 
-    public UserResponseDto findUserById(Integer id) throws RuntimeException {
-        Optional<User> user = userRepository.findById(id);
+    public UserResponseDto findUserById(Integer id) throws UserNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
-        if (user.isEmpty()) {
-            throw new RuntimeException("Usuário não encontrado.");
-        }
-
-        return new UserResponseDto(user.get().getId(), user.get().getUsername(), user.get().getEmail());
+        return new UserResponseDto(user.getId(), user.getUsername(), user.getEmail());
     }
 
-    public void deleteUserById(Integer id) throws RuntimeException {
-        Optional<User> user = userRepository.findById(id);
+    public void deleteUserById(Integer id) throws UserNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
-        if (user.isEmpty()) {
-            throw new RuntimeException("Usuário não encontrado.");
-        }
-
-        userRepository.delete(user.get());
+        userRepository.delete(user);
     }
 
-    public UserResponseDto updateUserById(Integer id, UserRequestDto userDto) throws RuntimeException {
-        Optional<User> oldUser = userRepository.findById(id);
+    public UserResponseDto updateUserById(Integer id, UserRequestDto userDto) throws UserNotFoundException {
+        User updatedUser = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
-        if (oldUser.isEmpty()) {
-            throw new RuntimeException("Usuário não encontrado");
-        }
-
-        User updatedUser = oldUser.get();
         BeanUtils.copyProperties(userDto, updatedUser);
         updatedUser.setPassword(encoderPassword.encode(updatedUser.getPassword()));
         userRepository.save(updatedUser);
