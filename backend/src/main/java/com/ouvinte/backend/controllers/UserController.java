@@ -21,14 +21,14 @@ public class UserController {
     // Authentication endpoints:
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@Valid @RequestBody UserRequestDto userDto) {
-        return ResponseEntity.ok(userService.verify(userDto));
+    public ResponseEntity<String> loginUser(@Valid @RequestBody UserRequestDto userRequestDto) {
+        return ResponseEntity.ok(userService.verify(userRequestDto));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserRequestDto> registerUser(@Valid @RequestBody UserRequestDto userDto) {
-        userService.registerUser(userDto);
-        return ResponseEntity.status(201).body(userDto);
+    public ResponseEntity<UserRequestDto> registerUser(@Valid @RequestBody UserRequestDto userRequestDto) {
+        userService.registerUser(userRequestDto);
+        return ResponseEntity.status(201).body(userRequestDto);
     }
 
     // CRUD endpoints:
@@ -46,13 +46,13 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<UserResponseDto> deleteUserByUsername(@PathVariable Integer id){
-        UserResponseDto userDto = userService.findUserById(id);
+        UserResponseDto userRequestDto = userService.findUserById(id);
         userService.deleteUserById(id);
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(userRequestDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Integer id, @RequestBody UserRequestDto userDto){
-        return ResponseEntity.ok(userService.updateUserById(id, userDto));
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Integer id, @Valid @RequestBody UserRequestDto userRequestDto){
+        return ResponseEntity.ok(userService.updateUserById(id, userRequestDto));
     }
 }

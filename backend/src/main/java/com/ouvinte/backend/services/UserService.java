@@ -4,7 +4,7 @@ import com.ouvinte.backend.domain.User;
 import com.ouvinte.backend.dto.request.UserRequestDto;
 import com.ouvinte.backend.dto.response.UserResponseDto;
 import com.ouvinte.backend.exceptions.InvalidCredentialsException;
-import com.ouvinte.backend.exceptions.UserNotFoundException;
+import com.ouvinte.backend.exceptions.ResourceNotFoundException;
 import com.ouvinte.backend.repositories.UserRepository;
 import com.ouvinte.backend.services.security.JwtService;
 import org.springframework.beans.BeanUtils;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -31,7 +30,7 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
 
-    private BCryptPasswordEncoder encoderPassword = new BCryptPasswordEncoder(12); // Instancia o encriptador
+    private final BCryptPasswordEncoder encoderPassword = new BCryptPasswordEncoder(12); // Instancia o encriptador
 
     // Interaction operations with databases:
 
@@ -43,22 +42,22 @@ public class UserService {
                 .toList();
     }
 
-    public UserResponseDto findUserById(Integer id) throws UserNotFoundException {
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    public UserResponseDto findUserById(Integer id) throws ResourceNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
 
         return new UserResponseDto(user.getId(), user.getUsername(), user.getEmail());
     }
 
-    public void deleteUserById(Integer id) throws UserNotFoundException {
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    public void deleteUserById(Integer id) throws ResourceNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
 
         userRepository.delete(user);
     }
 
-    public UserResponseDto updateUserById(Integer id, UserRequestDto userDto) throws UserNotFoundException {
-        User updatedUser = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    public UserResponseDto updateUserById(Integer id, UserRequestDto userRequestDto) throws ResourceNotFoundException {
+        User updatedUser = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
 
-        BeanUtils.copyProperties(userDto, updatedUser);
+        BeanUtils.copyProperties(userRequestDto, updatedUser);
         updatedUser.setPassword(encoderPassword.encode(updatedUser.getPassword()));
         userRepository.save(updatedUser);
 
@@ -67,29 +66,29 @@ public class UserService {
 
     // Authentication operations:
 
-    public String verify(UserRequestDto userDto) throws BadCredentialsException {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
+    public String verify(UserRequestDto userRequestDto) throws BadCredentialsException {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequestDto.getEmail(), userRequestDto.getPassword()));
 
         if (!authentication.isAuthenticated()) {
             throw new BadCredentialsException("Autenticação inválida");
         }
 
-        return jwtService.generateToken(userDto.getEmail());
+        return jwtService.generateToken(userRequestDto.getEmail());
     }
 
-    public void registerUser(UserRequestDto userDto) throws RuntimeException{
-        if (userDto == null || verifyIfEmailUserExists(userRepository.findAllUserEmails(), userDto)) {
+    public void registerUser(UserRequestDto userRequestDto) throws RuntimeException{
+        if (userRequestDto == null || verifyIfEmailUserExists(userRepository.findAllUserEmails(), userRequestDto)) {
             throw new InvalidCredentialsException();
         }
 
         User user = new User();
-        BeanUtils.copyProperties(userDto, user);
+        BeanUtils.copyProperties(userRequestDto, user);
         user.setPassword(encoderPassword.encode(user.getPassword())); // Define a senha encriptada no usuário
         userRepository.save(user);
     }
 
-    public boolean verifyIfEmailUserExists(List<String> emails, UserRequestDto userDto) {
+    public boolean verifyIfEmailUserExists(List<String> emails, UserRequestDto userRequestDto) {
         Collections.sort(emails);
-        return Collections.binarySearch(emails, userDto.getEmail()) > -1;
+        return Collections.binarySearch(emails, userRequestDto.getEmail()) > -1;
     }
 }

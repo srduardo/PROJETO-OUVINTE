@@ -1,5 +1,6 @@
 package com.ouvinte.backend.domain;
 
+import com.ouvinte.backend.dto.request.ComplaintRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,10 +18,8 @@ public class Complaint implements Comparable<Complaint> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String title;
-    private String decription;
+    private String description;
     private String type;
-    @Lob
-    @Column(columnDefinition = "BYTEA")
     private byte[] image;
     private double longitude;
     private double latitude;
@@ -29,6 +28,14 @@ public class Complaint implements Comparable<Complaint> {
     @Override
     public int compareTo(Complaint o) {
         return this.getTitle().compareTo(o.getTitle());
+    }
+
+    public Complaint(ComplaintRequestDto complaintRequestDto) {
+        this.title = complaintRequestDto.getTitle();
+        this.description = complaintRequestDto.getDescription();
+        this.type = complaintRequestDto.getType();
+        this.longitude = complaintRequestDto.getLongitude();
+        this.latitude = complaintRequestDto.getLatitude();
     }
 }
 
