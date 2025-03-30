@@ -17,10 +17,4 @@ public class UserRequestDto {
     @NotBlank
     @Size(min = 6)
     private String password;
-
-    public UserRequestDto(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
 }

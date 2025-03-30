@@ -38,14 +38,14 @@ public class UserService {
         return userRepository
                 .findAll()
                 .stream()
-                .map(user -> new UserResponseDto(user.getId(), user.getUsername(), user.getEmail()))
+                .map(user -> new UserResponseDto(user))
                 .toList();
     }
 
     public UserResponseDto findUserById(Integer id) throws ResourceNotFoundException {
         User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
 
-        return new UserResponseDto(user.getId(), user.getUsername(), user.getEmail());
+        return new UserResponseDto(user);
     }
 
     public void deleteUserById(Integer id) throws ResourceNotFoundException {
@@ -61,7 +61,7 @@ public class UserService {
         updatedUser.setPassword(encoderPassword.encode(updatedUser.getPassword()));
         userRepository.save(updatedUser);
 
-        return new UserResponseDto(updatedUser.getId(),updatedUser.getUsername(), updatedUser.getEmail());
+        return new UserResponseDto(updatedUser);
     }
 
     // Authentication operations:

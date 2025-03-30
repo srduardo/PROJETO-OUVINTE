@@ -43,7 +43,7 @@ public class ComplaintService {
         try {
             Complaint complaint = new Complaint(complaintRequestDto);
             complaint.setImage(image.getBytes());
-            complaint.setDuration(LocalDateTime.now().plusDays(7));
+            complaint.setDuration(LocalDateTime.now().plusDays(30));
 
             complaintRepository.save(complaint);
             return new ComplaintResponseDto(complaint);

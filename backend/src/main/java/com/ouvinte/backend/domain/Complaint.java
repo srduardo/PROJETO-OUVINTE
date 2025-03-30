@@ -24,6 +24,7 @@ public class Complaint implements Comparable<Complaint> {
     private double longitude;
     private double latitude;
     private LocalDateTime duration;
+    private int votes;
 
     @Override
     public int compareTo(Complaint o) {
@@ -36,6 +37,7 @@ public class Complaint implements Comparable<Complaint> {
         this.type = complaintRequestDto.getType();
         this.longitude = complaintRequestDto.getLongitude();
         this.latitude = complaintRequestDto.getLatitude();
+        this.votes = complaintRequestDto.getVotes();
     }
 }
 
