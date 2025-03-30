@@ -18,6 +18,7 @@ public class ComplaintResponseDto {
 
 
     public ComplaintResponseDto(Complaint complaint) {
+        this.id = complaint.getId();
         this.title = complaint.getTitle();
         this.description = complaint.getDescription();
         this.type = complaint.getType();
