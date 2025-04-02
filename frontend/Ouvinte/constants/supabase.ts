@@ -1,0 +1,2 @@
+export const supaUrl = 'https://wkwtjitaolntzcobdmny.supabase.co'
+export const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indrd3RqaXRhb2xudHpjb2JkbW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxMjE0MTgsImV4cCI6MjA1ODY5NzQxOH0.WseXFeUMuq0igFl2iGBDq8tLciHqwz55jYtU871PHVs'
