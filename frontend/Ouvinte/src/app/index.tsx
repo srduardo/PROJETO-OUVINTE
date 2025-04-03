@@ -1,6 +1,6 @@
 import { Pressable, Text, TextInput, View, Image, TouchableOpacity, SafeAreaView, ScrollView, Alert } from 'react-native';
 import { styles } from '../../constants/styles';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
 
 
@@ -21,6 +21,7 @@ export default function Login() {
     // Aqui você pode adicionar a lógica para registrar o usuário, como chamar uma API ou usar Firebase.
 
     console.log("Login efetuado com sucesso!");
+    router.push('/(painel)/profile/Map');
 
   }
 

@@ -78,5 +78,9 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '80%',
         paddingBlockEnd: 10,
+    },
+    map: {
+        flex: 1,
+        width: '100%',
     }
 })
