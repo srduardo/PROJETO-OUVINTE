@@ -81,7 +81,6 @@ export default function Profile() {
                         <Icon name="pluscircleo" size={24} color="black" />
                     </TouchableOpacity>
 
-
                     <TouchableOpacity onPress={() => router.push('/(painel)/profile/settings')}>
                         <Icon name="logout" size={24} color="black" />
                     </TouchableOpacity>

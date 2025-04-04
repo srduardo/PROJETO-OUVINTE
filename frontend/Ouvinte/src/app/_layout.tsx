@@ -5,14 +5,24 @@ export default function MainLayout() {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
 
-      <Stack.Screen name="(auth)/signup/Cadastro" options={{headerTitle:"Voltar!",
-        headerStyle: { backgroundColor: '#E5E1E1' },  }} />
+      <Stack.Screen name="(auth)/signup/Cadastro" options={{
+        headerTitle: "Voltar!",
+        headerStyle: { backgroundColor: '#E5E1E1' },
+      }} />
 
-      <Stack.Screen name="(auth)/signup/Esquecido" options={{ headerTitle:"Voltar!",
-        headerStyle: { backgroundColor: '#E5E1E1' },   }} />
+      <Stack.Screen name="(auth)/signup/Esquecido" options={{
+        headerTitle: "Voltar!",
+        headerStyle: { backgroundColor: '#E5E1E1' },
+      }} />
 
-        <Stack.Screen name="(painel)/profile/Map" options={{ headerTitle: '',
-        headerStyle: { backgroundColor: '#E5E1E1' } }} />
+      <Stack.Screen name="(painel)/profile/Map" options={{
+       headerShown: false,}
+      } />
+
+      <Stack.Screen name="(painel)/profile/denuncia" options={{
+        headerTitle: 'Voltar!',
+        headerStyle: { backgroundColor: '#E5E1E1' },
+      }} />
     </Stack>
   );
 }

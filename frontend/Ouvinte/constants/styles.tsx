@@ -91,7 +91,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-around',
         paddingBottom: 10,
         backgroundColor: 'rgba(0, 0, 0, 0.0)',
-
+        
     },
     button: {
         backgroundColor: '#ffffff',
@@ -115,4 +115,106 @@ export const styles = StyleSheet.create({
             margin: 10,
             justifyContent: 'space-between',
         },
+        container1: {
+            flex: 1,
+            backgroundColor: '#F5EDED',
+            padding: 20,
+          },
+          title1: {
+            fontSize: 32,
+            fontWeight: 'bold',
+            color: 'black',
+          },
+          inputContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: '#A8E6A1',
+            borderRadius: 10,
+            paddingHorizontal: 10,
+            marginVertical: 10,
+          },
+          input: {
+            flex: 1,
+            height: 50,
+            fontSize: 16,
+            color: 'black',
+          },
+          textArea: {
+            height: 100,
+            textAlignVertical: 'top',
+          },
+          uploadButton: {
+            backgroundColor: '#A8E6A1',
+            borderRadius: 10,
+            height: 100,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 10,
+          },
+          uploadText: {
+            marginTop: 10,
+            fontSize: 16,
+            color: 'black',
+          },
+          tipoContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: '#C4C4C4',
+            borderRadius: 10,
+            paddingHorizontal: 10,
+            height: 50,
+            marginVertical: 10,
+          },
+          tipoText: {
+            fontSize: 16,
+            color: 'black',
+          },
+          modalContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          },
+          modalContent: {
+            width: '80%',
+            backgroundColor: 'white',
+            borderRadius: 10,
+            padding: 20,
+          },
+          modalTitle: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            marginBottom: 10,
+          },
+          modalItem: {
+            paddingVertical: 10,
+            borderBottomWidth: 1,
+            borderBottomColor: '#ccc',
+          },
+          modalItemText: {
+            fontSize: 16,
+            color: 'black',
+          },
+          modalCloseButton: {
+            marginTop: 10,
+            alignItems: 'center',
+          },
+          modalCloseText: {
+            fontSize: 16,
+            color: 'red',
+          },
+          submitButton: {
+            backgroundColor: '#00C853',
+            borderRadius: 10,
+            height: 50,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 20,
+          },
+          submitText: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: 'white',
+          },
 })
