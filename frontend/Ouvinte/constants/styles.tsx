@@ -91,15 +91,28 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-around',
         paddingBottom: 10,
         backgroundColor: 'rgba(0, 0, 0, 0.0)',
+
     },
     button: {
         backgroundColor: '#ffffff',
         borderWidth: 2,
         borderRadius: 50,
-        width: 50,
+        width: '30%',
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
+        flexDirection: 'column',
     },
 
+    navBar: {
+            backgroundColor: '#A7E7BD',
+            borderWidth: 1,
+            borderRadius: 14,
+            fontSize: 16,
+            height: 50,
+            width: '80%',
+            padding: 10,
+            margin: 10,
+            justifyContent: 'space-between',
+        },
 })
