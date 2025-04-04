@@ -10,6 +10,7 @@ import {
 } from 'expo-location';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { styles } from '../../../../constants/styles';
+import { Link, router } from 'expo-router';
 
 export default function Profile() {
     const [location, setLocation] = useState<LocationObject | null>(null);
@@ -67,17 +68,22 @@ export default function Profile() {
                     />
                 </MapView>
             )}
-            <View style={styles.buttonContainer}>
-               <TouchableOpacity style={styles.button}>
-                  <Icon name="home" size={24} color="black" />
-                   <Text style={styles.buttonText}>Botão 1</Text>
-                  </TouchableOpacity>
-                    <TouchableOpacity style={styles.button}>
-                     <Text style={styles.buttonText}>Botão 2</Text>
+
+<View style={styles.navBar}>
+                <View style={styles.buttonContainer}>
+
+                    <TouchableOpacity onPress={() => router.push('/(painel)/profile/home')}>
+                        <Icon name="home" size={24} color="black" />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button}>
-                     <Text style={styles.buttonText}>Botão 3</Text>
-                  </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => router.push('/(painel)/profile/denuncia')}>
+                        <Icon name="pluscircleo" size={24} color="black" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => router.push('/(painel)/profile/settings')}>
+                        <Icon name="setting" size={24} color="black" />
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
