@@ -9,8 +9,10 @@ export default function MainLayout() {
         headerStyle: { backgroundColor: '#E5E1E1' },  }} />
 
       <Stack.Screen name="(auth)/signup/Esquecido" options={{ headerTitle:"Voltar!",
-        headerStyle: { backgroundColor: '#E5E1E1' },
-        }} />
+        headerStyle: { backgroundColor: '#E5E1E1' },   }} />
+
+        <Stack.Screen name="(painel)/profile/Map" options={{ headerTitle: '',
+        headerStyle: { backgroundColor: '#E5E1E1' } }} />
     </Stack>
   );
 }
