@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import {
     requestForegroundPermissionsAsync,
@@ -8,7 +8,9 @@ import {
     LocationObject,
     LocationAccuracy,
 } from 'expo-location';
+import Icon from 'react-native-vector-icons/AntDesign';
 import { styles } from '../../../../constants/styles';
+
 export default function Profile() {
     const [location, setLocation] = useState<LocationObject | null>(null);
     const mapRef = useRef<MapView | null>(null);
@@ -65,6 +67,18 @@ export default function Profile() {
                     />
                 </MapView>
             )}
+            <View style={styles.buttonContainer}>
+               <TouchableOpacity style={styles.button}>
+                  <Icon name="home" size={24} color="black" />
+                   <Text style={styles.buttonText}>Botão 1</Text>
+                  </TouchableOpacity>
+                    <TouchableOpacity style={styles.button}>
+                     <Text style={styles.buttonText}>Botão 2</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.button}>
+                     <Text style={styles.buttonText}>Botão 3</Text>
+                  </TouchableOpacity>
+            </View>
         </View>
     );
 }

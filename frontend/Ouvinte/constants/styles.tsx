@@ -82,5 +82,24 @@ export const styles = StyleSheet.create({
     map: {
         flex: 1,
         width: '100%',
-    }
+    },
+    buttonContainer: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        paddingBottom: 10,
+        backgroundColor: 'rgba(0, 0, 0, 0.0)',
+    },
+    button: {
+        backgroundColor: '#ffffff',
+        borderWidth: 2,
+        borderRadius: 50,
+        width: 50,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
 })
