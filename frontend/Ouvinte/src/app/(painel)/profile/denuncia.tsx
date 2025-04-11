@@ -13,6 +13,8 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
 import { styles } from '../../../../constants/styles';
+import { saveDataLocally } from '../../services/storageService';
+import { syncComplaintWithBackend } from '../../services/api';
 
 export default function Denuncia() {
   const [nomeDenuncia, setNomeDenuncia] = useState('');
@@ -46,6 +48,21 @@ export default function Denuncia() {
       Alert.alert('Erro', 'Preencha todos os campos antes de enviar a denúncia.');
       return;
     }
+
+    const data = {
+      name: nomeDenuncia,
+      description: descricaoDenuncia,
+      type: tipoDenuncia,
+      longitude: -24.23640816230186, 
+      latitude: -51.666254590605874,
+      votes: 1
+    }
+
+    const json = JSON.stringify(data); 
+    saveDataLocally('denuncia', json);
+    console.log('Denúncia salva localmente:', json);
+    syncComplaintWithBackend(data);
+    
     Alert.alert('Denúncia enviada!', 'Sua denúncia foi registrada com sucesso.');
   };
 

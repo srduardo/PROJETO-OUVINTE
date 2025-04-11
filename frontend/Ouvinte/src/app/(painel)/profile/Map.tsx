@@ -11,10 +11,14 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import { styles } from '../../../../constants/styles';
 import { Link, router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Complaint } from '../../types/Complaint';
+import { useWebSocket } from '../../services/webSocketService';
 
 export default function Profile() {
     const [location, setLocation] = useState<LocationObject | null>(null);
     const mapRef = useRef<MapView | null>(null);
+    const [complaints, setComplaints] = useState<Complaint[]>([]);
 
     async function requestLocationPermission() {
         const { granted } = await requestForegroundPermissionsAsync();
@@ -25,14 +29,44 @@ export default function Profile() {
         }
     }
 
+    const handleComplaint = async (complaintsFromBack: string) => {
+        const jsonComplaintsFromBack: Complaint[] = JSON.parse(complaintsFromBack);
+        
+        const stored = await AsyncStorage.getItem('complaints');
+        const storedComplaints: Complaint[] = stored ? JSON.parse(stored) : [];
+
+        const storedComplaintIds = new Set(storedComplaints.map((c) => c.id));
+        const newComplaint = jsonComplaintsFromBack.filter((c) => !storedComplaintIds.has(c.id));
+
+        if (newComplaint.length > 0) {
+            const complaints: Complaint[] = [...storedComplaints, ...newComplaint];
+            await AsyncStorage.setItem('complaints', JSON.stringify(complaints));
+            setComplaints(complaints);
+        }
+    };
+
+    useWebSocket(handleComplaint);
+
+    useEffect(() => {
+        const loadStoredComplaints = async () =>  {
+            const stored = await AsyncStorage.getItem('complaints');
+            if (stored) {
+                const jsonComplaints = JSON.parse(stored);
+                setComplaints(jsonComplaints);
+            }
+        };
+
+        loadStoredComplaints();
+    }, [])
+
     useEffect(() => {
         requestLocationPermission();
     }, []);
 
     useEffect(() => {
         watchPositionAsync({
-            accuracy: LocationAccuracy.High,
-            timeInterval: 1000,
+            accuracy: LocationAccuracy.Balanced,
+            timeInterval: 10000,
             distanceInterval: 1,
         }, (response) => {
             setLocation(response);
@@ -66,6 +100,15 @@ export default function Profile() {
                             longitude: location.coords.longitude,
                         }}
                     />
+
+                    {complaints.map((c) => (
+                        <Marker
+                            key={c.id}
+                            coordinate={{longitude: c.longitude, latitude: c.latitude}}
+                            title={c.title}
+                            description={c.description}
+                        />
+                    ))}
                 </MapView>
             )}
 
