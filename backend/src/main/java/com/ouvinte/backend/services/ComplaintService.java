@@ -5,12 +5,14 @@ import com.ouvinte.backend.dto.request.ComplaintRequestDto;
 import com.ouvinte.backend.dto.response.ComplaintResponseDto;
 import com.ouvinte.backend.exceptions.ResourceNotFoundException;
 import com.ouvinte.backend.repositories.ComplaintRepository;
+import com.ouvinte.backend.services.webSocket.CustomWebSocketHandler;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +21,10 @@ public class ComplaintService {
 
     @Autowired
     private ComplaintRepository complaintRepository;
+
+    @Lazy
+    @Autowired
+    private CustomWebSocketHandler customWebSocketHandler;
 
     public List<ComplaintResponseDto> findAllComplaints() {
         return complaintRepository
@@ -46,8 +52,10 @@ public class ComplaintService {
             complaint.setDuration(LocalDateTime.now().plusDays(30));
 
             complaintRepository.save(complaint);
+            customWebSocketHandler.broadcast(findAllComplaints());;
+
             return new ComplaintResponseDto(complaint);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Não foi possível processar a denúncia!");
         }
     }
