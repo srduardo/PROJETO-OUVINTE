@@ -2,6 +2,9 @@ import { Pressable, Text, TextInput, View, Image, TouchableOpacity, SafeAreaView
 import { styles } from '../../constants/styles';
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
+import { User } from './types/User';
+import { signInUser } from './services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Login() {
@@ -12,17 +15,35 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
 
-  function handleSignIn() {
+  async function handleSignIn() {
+    const user = await AsyncStorage.getItem('user');
+    const jsonUser = JSON.parse(user);
+
     if (email === "" || password === "") {
       Alert.alert("Preencha todos os campos!");
       return;
     }
+    
+    if (!jsonUser) {
+      Alert.alert("Usuário não encontrado. Por favor, cadastre-se.");
+      return;
+    }
 
-    // Aqui você pode adicionar a lógica para registrar o usuário, como chamar uma API ou usar Firebase.
+    if (jsonUser.password !== password) {
+      Alert.alert("Senha incorreta.");
+      return;
+    }
+
+    const token = await signInUser(jsonUser);
+  
+    if (!token) {
+      Alert.alert("Erro ao efetuar login. Verifique suas credenciais.");
+      return;   
+    }
 
     console.log("Login efetuado com sucesso!");
+    console.log(token);
     router.push('/(painel)/profile/Map');
-
   }
 
   return (

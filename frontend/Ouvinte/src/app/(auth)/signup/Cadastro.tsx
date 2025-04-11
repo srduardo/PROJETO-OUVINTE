@@ -4,10 +4,13 @@ import React, { useState } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../../../lib/supabase';
 import { router } from 'expo-router';
+import { User } from '../../types/User';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { signUpUser } from '../../services/api';
 
 
 export default function Cadastro() {
-    const [name, setName] = useState('');
+    const [username, setUsermame] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -16,7 +19,7 @@ export default function Cadastro() {
 
 
     async function handleSignUp() {
-        if (name === "" || email === "" || password === "" || confirmPassword === "") {
+        if (username === "" || email === "" || password === "" || confirmPassword === "") {
             setError("Preencha todos os campos!");
             return;
         }
@@ -30,6 +33,7 @@ export default function Cadastro() {
             setError("A senha deve ter pelo menos 6 caracteres!");
             return;
         }
+
         setLoading(true);
 
         const { data, error } = await supabase.auth.signUp({
@@ -37,6 +41,9 @@ export default function Cadastro() {
             password: password,
 
         });
+
+        const user: User = {username, email, password};
+        signUpUser(user);
 
         if (error) {
             Alert.alert("Erro", error.message)
@@ -57,8 +64,8 @@ export default function Cadastro() {
 
                     <TextInput style={styles.formInput}
                         placeholder="Informe o seu nome"
-                        value={name}
-                        onChangeText={setName}
+                        value={username}
+                        onChangeText={setUsermame}
                     />
 
                     <TextInput style={styles.formInput}
