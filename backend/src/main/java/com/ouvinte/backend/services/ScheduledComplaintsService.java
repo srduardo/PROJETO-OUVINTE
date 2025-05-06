@@ -24,7 +24,7 @@ public class ScheduledComplaintsService {
         complaintService.findAllComplaints().forEach(complaint -> {
             if (complaint.getDuration().isBefore(LocalDateTime.now())) {
                 restTemplate.postForObject(
-                        "http://localhost:8080/complaints/delete",
+                        "http://localhost:8080/api/complaints/delete",
                         complaint,
                         Void.class
                 );

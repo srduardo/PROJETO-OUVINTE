@@ -73,6 +73,7 @@ public class UserService {
             throw new BadCredentialsException("Autenticação inválida");
         }
 
+        System.out.println("Autenticado!!!!");
         return jwtService.generateToken(userRequestDto.getEmail());
     }
 
