@@ -41,7 +41,6 @@ export default function Login() {
       return;   
     }
 
-    console.log("Login efetuado com sucesso!");
     console.log(token);
     router.push('/(painel)/profile/Map');
   }

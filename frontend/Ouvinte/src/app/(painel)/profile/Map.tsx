@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import {
@@ -14,12 +14,20 @@ import { Link, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Complaint } from '../../types/Complaint';
 import { useWebSocket } from '../../services/webSocketService';
+import { sortRoutes } from 'expo-router/build/sortRoutes';
+import { handleComplaintLocation, filterComplaints, storeComplaintsLocally, removeDeletedComplaints, updateComplaints } from '../../services/complaintService';
+import { useFocusEffect } from 'expo-router';
 
 export default function Profile() {
     const [location, setLocation] = useState<LocationObject | null>(null);
     const mapRef = useRef<MapView | null>(null);
     const [complaints, setComplaints] = useState<Complaint[]>([]);
-
+    const [socketControls, setSocketControls] = useState<{
+        send: (message: string) => void;
+        close: () => void;
+      } | null>(null);
+    
+    // Localização
     async function requestLocationPermission() {
         const { granted } = await requestForegroundPermissionsAsync();
         if (granted) {
@@ -29,36 +37,48 @@ export default function Profile() {
         }
     }
 
-    const handleComplaint = async (complaintsFromBack: string) => {
-        const jsonComplaintsFromBack: Complaint[] = JSON.parse(complaintsFromBack);
-        
+    // Manipulação de denúncias
+    const handleComplaint = useCallback(async (complaintsFromBack: string)=> {
+        const jsonComplaints: Complaint[] = handleComplaintLocation(JSON.parse(complaintsFromBack));
         const stored = await AsyncStorage.getItem('complaints');
-        const storedComplaints: Complaint[] = stored ? JSON.parse(stored) : [];
-
-        const storedComplaintIds = new Set(storedComplaints.map((c) => c.id));
-        const newComplaint = jsonComplaintsFromBack.filter((c) => !storedComplaintIds.has(c.id));
-
-        if (newComplaint.length > 0) {
-            const complaints: Complaint[] = [...storedComplaints, ...newComplaint];
-            await AsyncStorage.setItem('complaints', JSON.stringify(complaints));
-            setComplaints(complaints);
+    
+        if (!stored) {
+            storeComplaintsLocally(jsonComplaints);
+            console.log('Primeiras denúncias registradas!');
+            return;
+        }
+    
+        const jsonStoredComplaints: Complaint[] = JSON.parse(stored);
+        const [newComplaints, deletedComplaints] = filterComplaints(jsonStoredComplaints, jsonComplaints);
+        const nonDeletedCompalints: Complaint[] = removeDeletedComplaints(deletedComplaints, jsonStoredComplaints);
+        
+        updateComplaints(newComplaints, nonDeletedCompalints);
+    }, []);
+        
+    const loadStoredComplaints = async () =>  {
+        const stored = await AsyncStorage.getItem('complaints');
+        if (stored) {
+            const jsonComplaints: Complaint[] = JSON.parse(stored);
+            setComplaints(jsonComplaints);
+            console.log('loaded!')
         }
     };
 
-    useWebSocket(handleComplaint);
+    // Use's
 
-    useEffect(() => {
-        const loadStoredComplaints = async () =>  {
-            const stored = await AsyncStorage.getItem('complaints');
-            if (stored) {
-                const jsonComplaints = JSON.parse(stored);
-                setComplaints(jsonComplaints);
-            }
-        };
-
-        loadStoredComplaints();
-    }, [])
-
+    useFocusEffect(
+        React.useCallback(() => {
+            const {send, close} = useWebSocket(handleComplaint);
+            setSocketControls({send, close});
+            loadStoredComplaints();
+            return () => {
+            close();
+            setSocketControls(null);
+          };
+        }, [])
+      );
+    
+    
     useEffect(() => {
         requestLocationPermission();
     }, []);
@@ -99,20 +119,21 @@ export default function Profile() {
                             latitude: location.coords.latitude,
                             longitude: location.coords.longitude,
                         }}
+                        icon={require('../../../../assets/img/user-pin.png')}
                     />
 
-                    {complaints.map((c) => (
-                        <Marker
-                            key={c.id}
-                            coordinate={{longitude: c.longitude, latitude: c.latitude}}
-                            title={c.title}
-                            description={c.description}
-                        />
-                    ))}
+                    { complaints.filter((c1) => c1.location && c1.location.coords).map((c2) => {
+                        return (
+                            <Marker key={c2.id} coordinate={{latitude: c2.location.coords.latitude, longitude: c2.location.coords.longitude}} title={c2.title} icon={require('../../../../assets/img/complaint-pin.png')}/>
+                        );
+                    })
+
+                    }
+
                 </MapView>
             )}
 
-<View style={styles.navBar}>
+            <View style={styles.navBar}>
                 <View style={styles.buttonContainer}>
 
                     <TouchableOpacity onPress={() => router.push('/(painel)/profile/home')}>

@@ -69,7 +69,7 @@ export const signInUser = async (user: User) => {
         
         const token = await response.text();
         await AsyncStorage.setItem('jwt', token);
-        console.log('Usuário logado com sucesso');
+        console.log('Login efetuado com sucesso!');
         return token;
     } catch (error) {
         console.error('Erro ao logar usuário:', error);

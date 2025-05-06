@@ -1,41 +1,31 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useRef} from 'react';
-import { getJWT } from './storageService';
+import { Complaint } from '../types/Complaint';
 
 const WEBSOCKET_URL = 'ws://192.168.18.3:8080/ws';
 
-export const useWebSocket = async (handleComplaint: (message: string) => void) => {
-    const socket = useRef<WebSocket | null>(null);
-    const token: string = await getJWT('JWT');
-    const query: string = `${WEBSOCKET_URL}?token=${token}`;
+export const useWebSocket = (handleComplaint: (message: string) => void) => {
+    const socket = new WebSocket(WEBSOCKET_URL);
 
-    if (!token) {
-        console.warn('Token não coletado');
-        return;
+    socket.onopen = () => {
+        socket.send('Solicitação...');
+        console.log('WebSocket conectado!');
     }
 
-    useEffect(() => {
-        socket.current = new WebSocket(query);
+    socket.onmessage = (event) => {
+        handleComplaint(event.data);
+        console.log(event.data);
+    };
 
-        socket.current.onmessage = (event) => {
-            console.log('Mensagem recebida:', event.data);
-            handleComplaint(event.data);
-        };
+    socket.onerror = (error) => {
+        console.log('Erro:', error);
+    };
 
-        socket.current.onerror = (error) => {
-            console.log('Erro:', error);
-        };
+    socket.onclose = () => {
+        console.log('WebSocket desconectado!');
+    }
 
-        socket.current.onclose = () => {
-            console.log('WebSocket desconectado');
-        };
+    const send = (data: string) => socket.send(data);
+    const close = () => socket.close();
 
-        return () => {
-            if (socket.current) {
-                socket.current.close();
-            }
-        }
-    }, [handleComplaint]);
-
-    return socket.current;
+    return {send, close};
 }
