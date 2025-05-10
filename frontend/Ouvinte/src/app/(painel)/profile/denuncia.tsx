@@ -14,13 +14,17 @@ import Icon from 'react-native-vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
 import { styles } from '../../../../constants/styles';
 import { saveDataLocally } from '../../services/storageService';
-import { syncComplaintWithBackend } from '../../services/api';
+import { registerComplaint } from '../../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LocationObject } from 'expo-location';
+import { ComplaintRequest } from '../../types/ComplaintRequest';
+import { ImageFile } from '../../types/ImageFile';
 
 export default function Denuncia() {
   const [nomeDenuncia, setNomeDenuncia] = useState('');
   const [descricaoDenuncia, setDescricaoDenuncia] = useState('');
   const [tipoDenuncia, setTipoDenuncia] = useState('Selecione o tipo');
-  const [imagem, setImagem] = useState<string | null>(null);
+  const [imagem, setImagem] = useState<ImageFile | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   const tipos = [
@@ -33,35 +37,51 @@ export default function Denuncia() {
 
   const handleAnexarImagem = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: 'images',
       allowsEditing: true,
       quality: 1,
     });
 
     if (!result.canceled) {
-      setImagem(result.assets[0].uri);
+      const uri = result.assets[0].uri;
+      const filename = uri.split('/').pop() || 'photo.jpg';
+
+      const match = /\.(\w+)$/.exec(filename);
+      const ext = match?.[1]?.toLowerCase() || 'jpg';
+      const mimeType = `image/${ext === 'jpg' ? 'jpeg' : ext}`;
+
+      const imageFile: ImageFile = {
+        uri: uri,
+        name: filename,
+        type: mimeType  
+      }
+
+      setImagem(imageFile);
+      console.log('Imagem coletada: ', imageFile);
     }
   };
 
-  const handleDenunciar = () => {
-    if (!nomeDenuncia || !descricaoDenuncia || tipoDenuncia === 'Selecione o tipo') {
+  const handleDenunciar = async () => {
+    if (!nomeDenuncia || !descricaoDenuncia || tipoDenuncia === 'Selecione o tipo' || !imagem) {
       Alert.alert('Erro', 'Preencha todos os campos antes de enviar a denúncia.');
       return;
     }
+    
+    const stringUserLocation: string = await AsyncStorage.getItem('userLocation');
+    const userLocation: LocationObject = JSON.parse(stringUserLocation);
 
-    const data = {
-      name: nomeDenuncia,
+    console.log('Localização do usuário: ', userLocation);
+    
+    const data: ComplaintRequest = {
+      title: nomeDenuncia,
       description: descricaoDenuncia,
       type: tipoDenuncia,
-      longitude: -24.23640816230186, 
-      latitude: -51.666254590605874,
+      longitude: userLocation.coords.longitude,
+      latitude: userLocation.coords.latitude,
       votes: 1
     }
-
-    const json = JSON.stringify(data); 
-    saveDataLocally('denuncia', json);
-    console.log('Denúncia salva localmente:', json);
-    syncComplaintWithBackend(data);
+    
+    registerComplaint(data, imagem);
     
     Alert.alert('Denúncia enviada!', 'Sua denúncia foi registrada com sucesso.');
   };

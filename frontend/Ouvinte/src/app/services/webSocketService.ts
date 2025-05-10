@@ -1,6 +1,3 @@
-import React, {useEffect, useRef} from 'react';
-import { Complaint } from '../types/Complaint';
-
 const WEBSOCKET_URL = 'ws://192.168.18.3:8080/ws';
 
 export const useWebSocket = (handleComplaint: (message: string) => void) => {
@@ -24,8 +21,7 @@ export const useWebSocket = (handleComplaint: (message: string) => void) => {
         console.log('WebSocket desconectado!');
     }
 
-    const send = (data: string) => socket.send(data);
     const close = () => socket.close();
 
-    return {send, close};
+    return {close};
 }

@@ -36,20 +36,9 @@ export default function Cadastro() {
 
         setLoading(true);
 
-        const { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-
-        });
-
         const user: User = {username, email, password};
         signUpUser(user);
 
-        if (error) {
-            Alert.alert("Erro", error.message)
-            setLoading(false);
-            return;
-        }
         setLoading(false);
         router.replace('/')
     }

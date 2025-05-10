@@ -1,32 +1,37 @@
 import { useCallback } from "react";
-import { Complaint } from "../types/Complaint";
 import { LocationObject, LocationObjectCoords } from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ComplaintResponse } from "../types/ComplaintResponse";
+import { ComplaintRequest } from "../types/ComplaintRequest";
+import { ComplaintMap } from "../types/ComplaintMap";
 
-export const handleComplaintLocation = (complaints: Complaint[]): Complaint[] => {
-    complaints.forEach((c) => {
-        const coords: LocationObjectCoords = {
-            longitude: c.latitude,
-            latitude: c.longitude,
-            altitude: 0,
-            accuracy: 0,
-            altitudeAccuracy: 0,
-            heading: 0,
-            speed: 0
-        }
+export const getComplaintLocation = (complaint: ComplaintResponse): LocationObject => {
+    const coords: LocationObjectCoords = {
+        longitude: complaint.longitude,
+        latitude: complaint.latitude,
+        altitude: 0,
+        accuracy: 0,
+        altitudeAccuracy: 0,
+        heading: 0,
+        speed: 0
+    }
 
-        const complaintLocation: LocationObject = {
-            coords: coords,
-            timestamp: 0
-        }
-
-        c.location = complaintLocation;
-    });
-
-    return complaints;
+    const complaintLocation: LocationObject = {
+        coords: coords,
+        timestamp: 0
+    }
+    
+    return complaintLocation;
 }
 
-export const filterComplaints = (jsonStoredComplaints: Complaint[], jsonComplaints: Complaint[]): Complaint[][] => {
+export const applyComplaintLocation = async (complaint: ComplaintMap): Promise<ComplaintMap> => {
+    const stringUserLocation: string = await AsyncStorage.getItem('userLocation');
+    const jsonUserLocation = JSON.parse(stringUserLocation);
+    complaint.location = jsonUserLocation;    
+    return complaint; 
+}
+
+export const filterComplaints = (jsonStoredComplaints: ComplaintMap[], jsonComplaints: ComplaintMap[]): ComplaintMap[][] => {
     const storedComplaintIds = new Set(jsonStoredComplaints.map((c) => c.id));
     const newComplaint = jsonComplaints.filter((c) => !storedComplaintIds.has(c.id));
 
@@ -36,12 +41,12 @@ export const filterComplaints = (jsonStoredComplaints: Complaint[], jsonComplain
     return [newComplaint, deletedComplaint];
 }
 
-export const storeComplaintsLocally = async (complaints: Complaint[]) => {
+export const storeComplaintsLocally = async (complaints: ComplaintMap[]) => {
     const stringComplaints: string = JSON.stringify(complaints);
     await AsyncStorage.setItem('complaints', stringComplaints);
 }
 
-export const updateComplaints = (newComplaints: Complaint[], jsonStoredComplaints: Complaint[]) => {
+export const updateComplaints = (newComplaints: ComplaintMap[], jsonStoredComplaints: ComplaintMap[]) => {
     if (newComplaints.length > 0) {
         newComplaints = [...jsonStoredComplaints, ...newComplaints];
         storeComplaintsLocally(newComplaints);
@@ -50,7 +55,7 @@ export const updateComplaints = (newComplaints: Complaint[], jsonStoredComplaint
     }
 }
 
-export const removeDeletedComplaints = (deletedComplaints: Complaint[], jsonStoredComplaints: Complaint[]): Complaint[] => {
+export const removeDeletedComplaints = (deletedComplaints: ComplaintMap[], jsonStoredComplaints: ComplaintMap[]): ComplaintMap[] => {
     if (deletedComplaints) {           
         const deletedComplaintsId = new Set(deletedComplaints.map((c) => c.id));
         const nonDeletedComplaints = jsonStoredComplaints.filter((c) => !deletedComplaintsId.has(c.id));

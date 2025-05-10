@@ -11,18 +11,18 @@ export default function Esquecido() {
             <Image style={styles.img} source={require('../../../../assets/img/OvF.png')} />
 
             <TextInput style={styles.formInput}
-                placeholder="Informe o E-mail"
+                placeholder="Seu e-mail"
                 keyboardType="email-address"
                 autoComplete="email">
             </TextInput>
 
             <TextInput style={styles.formInput}
-                placeholder="Informe a nova Senha"
+                placeholder="Nova senha"
                 secureTextEntry>
             </TextInput>
 
             <TextInput style={styles.formInput}
-                placeholder="Informe a nova Senha novamente"
+                placeholder="Confirme a senha"
                 secureTextEntry>
             </TextInput>
 

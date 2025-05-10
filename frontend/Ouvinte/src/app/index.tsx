@@ -3,7 +3,7 @@ import { styles } from '../../constants/styles';
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
 import { User } from './types/User';
-import { signInUser } from './services/api';
+import { signInUser, fetchUserByEmail } from './services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -16,25 +16,13 @@ export default function Login() {
 
 
   async function handleSignIn() {
-    const user = await AsyncStorage.getItem('user');
-    const jsonUser = JSON.parse(user);
-
     if (email === "" || password === "") {
       Alert.alert("Preencha todos os campos!");
       return;
     }
-    
-    if (!jsonUser) {
-      Alert.alert("Usuário não encontrado. Por favor, cadastre-se.");
-      return;
-    }
 
-    if (jsonUser.password !== password) {
-      Alert.alert("Senha incorreta.");
-      return;
-    }
-
-    const token = await signInUser(jsonUser);
+    const user: User = {username: 'Usuário', email: email, password: password};
+    const token = await signInUser(user);
   
     if (!token) {
       Alert.alert("Erro ao efetuar login. Verifique suas credenciais.");

@@ -1,6 +1,4 @@
-import { LocationObject } from "expo-location";
-
-export type Complaint = {
+export type ComplaintResponse = {
     id: string,
     title: string,
     description: string,
@@ -9,5 +7,4 @@ export type Complaint = {
     longitude: number,
     duration: string,
     votes: number
-    location: LocationObject,
 };

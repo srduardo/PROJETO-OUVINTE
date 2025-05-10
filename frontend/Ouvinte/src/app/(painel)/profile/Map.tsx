@@ -12,20 +12,19 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import { styles } from '../../../../constants/styles';
 import { Link, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Complaint } from '../../types/Complaint';
+import { ComplaintResponse } from '../../types/ComplaintResponse';
 import { useWebSocket } from '../../services/webSocketService';
 import { sortRoutes } from 'expo-router/build/sortRoutes';
-import { handleComplaintLocation, filterComplaints, storeComplaintsLocally, removeDeletedComplaints, updateComplaints } from '../../services/complaintService';
+import { getComplaintLocation, filterComplaints, storeComplaintsLocally, removeDeletedComplaints, updateComplaints } from '../../services/complaintService';
 import { useFocusEffect } from 'expo-router';
+import { ComplaintRequest } from '../../types/ComplaintRequest';
+import { ComplaintMap } from '../../types/ComplaintMap';
+
 
 export default function Profile() {
     const [location, setLocation] = useState<LocationObject | null>(null);
     const mapRef = useRef<MapView | null>(null);
-    const [complaints, setComplaints] = useState<Complaint[]>([]);
-    const [socketControls, setSocketControls] = useState<{
-        send: (message: string) => void;
-        close: () => void;
-      } | null>(null);
+    const [complaints, setComplaints] = useState<ComplaintMap[]>([]);
     
     // Localização
     async function requestLocationPermission() {
@@ -33,24 +32,37 @@ export default function Profile() {
         if (granted) {
             const currentPosition = await getCurrentPositionAsync({});
             setLocation(currentPosition);
+            const stringCurrentPosition: string = JSON.stringify(currentPosition);
+            await AsyncStorage.setItem('userLocation', stringCurrentPosition);
             console.log('Permissão de localização concedida');
         }
     }
 
     // Manipulação de denúncias
     const handleComplaint = useCallback(async (complaintsFromBack: string)=> {
-        const jsonComplaints: Complaint[] = handleComplaintLocation(JSON.parse(complaintsFromBack));
+        const complaintsResponse: ComplaintResponse[] = JSON.parse(complaintsFromBack);
         const stored = await AsyncStorage.getItem('complaints');
-    
+
+        const complaintsMap: ComplaintMap[] = complaintsResponse.map((c) => ({
+            id: c.id, 
+            title: c.title, 
+            description: c.description, 
+            type: c.type, 
+            votes: c.votes, 
+            latitude: c.latitude, 
+            longitude: c.longitude, 
+            location: getComplaintLocation(c)
+        }))
+
         if (!stored) {
-            storeComplaintsLocally(jsonComplaints);
+            storeComplaintsLocally(complaintsMap);
             console.log('Primeiras denúncias registradas!');
             return;
         }
     
-        const jsonStoredComplaints: Complaint[] = JSON.parse(stored);
-        const [newComplaints, deletedComplaints] = filterComplaints(jsonStoredComplaints, jsonComplaints);
-        const nonDeletedCompalints: Complaint[] = removeDeletedComplaints(deletedComplaints, jsonStoredComplaints);
+        const jsonStoredComplaints: ComplaintMap[] = JSON.parse(stored);
+        const [newComplaints, deletedComplaints] = filterComplaints(jsonStoredComplaints, complaintsMap);
+        const nonDeletedCompalints: ComplaintMap[] = removeDeletedComplaints(deletedComplaints, jsonStoredComplaints);
         
         updateComplaints(newComplaints, nonDeletedCompalints);
     }, []);
@@ -58,7 +70,7 @@ export default function Profile() {
     const loadStoredComplaints = async () =>  {
         const stored = await AsyncStorage.getItem('complaints');
         if (stored) {
-            const jsonComplaints: Complaint[] = JSON.parse(stored);
+            const jsonComplaints: ComplaintMap[] = JSON.parse(stored);
             setComplaints(jsonComplaints);
             console.log('loaded!')
         }
@@ -68,24 +80,23 @@ export default function Profile() {
 
     useFocusEffect(
         React.useCallback(() => {
-            const {send, close} = useWebSocket(handleComplaint);
-            setSocketControls({send, close});
+            const {close} = useWebSocket(handleComplaint);
             loadStoredComplaints();
+            requestLocationPermission();
             return () => {
-            close();
-            setSocketControls(null);
+                close();
           };
         }, [])
       );
     
     
-    useEffect(() => {
-        requestLocationPermission();
-    }, []);
+    // useEffect(() => {
+    //     requestLocationPermission();
+    // }, []);
 
     useEffect(() => {
         watchPositionAsync({
-            accuracy: LocationAccuracy.Balanced,
+            accuracy: LocationAccuracy.High,
             timeInterval: 10000,
             distanceInterval: 1,
         }, (response) => {
@@ -145,7 +156,7 @@ export default function Profile() {
                         <Icon name="pluscircleo" size={24} color="black" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => router.push('/(painel)/profile/settings')}>
+                    <TouchableOpacity onPress={() => router.push('/')}>
                         <Icon name="logout" size={24} color="black" />
                     </TouchableOpacity>
                 </View>

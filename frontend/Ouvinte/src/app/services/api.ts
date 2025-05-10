@@ -1,23 +1,51 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User } from "../types/User";
+import { ComplaintRequest } from "../types/ComplaintRequest";
+import { ImageFile } from "../types/ImageFile";
 
 const BASE_URL = 'http://192.168.18.3:8080/api';
 
-export const syncComplaintWithBackend = async (complaint: any) => {
-    try {
-        const response = await fetch(BASE_URL + '/complaints', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(complaint),
+export const registerComplaint = async (complaint: ComplaintRequest, image: ImageFile) => {
+    const xmlRequest = new XMLHttpRequest();
+    const token = await AsyncStorage.getItem('jwt');
+
+    return new Promise((resolve, reject) => {
+        xmlRequest.onreadystatechange = () => {
+            if (xmlRequest.readyState !== 4) return;
+
+            console.log('Status:', xmlRequest.status);
+            console.log('Response:', xmlRequest.responseText);
+
+            if (xmlRequest.status === 200) {
+                resolve(JSON.parse(xmlRequest.responseText));
+            } else {
+                console.error('Erro no envio: ', xmlRequest.responseText);
+                reject('Erro ao enviar denúncia');
+            }
+        };
+
+        xmlRequest.open("POST", "http://192.168.18.3:8080/api/complaints");
+        xmlRequest.setRequestHeader("Authorization", `Bearer ${token}`);
+
+        console.log("Dados da denúncia:", JSON.stringify(complaint));
+        console.log("Imagem:", {
+            uri: image.uri,
+            name: image.name,
+            type: image.type,
         });
-        if (!response.ok) {
-            throw new Error('Erro ao sincronizar dados com o back-end');
-        }
-        console.log('Dados sincronizados com sucesso');
-    } catch (error) {
-        console.error('Erro ao sincronizar dados:', error);
-    }
+
+        const formData = new FormData();
+        formData.append("datas", JSON.stringify(complaint));
+        formData.append("image", {
+            uri: image.uri,
+            name: image.name,
+            type: image.type
+        } as any);
+
+        xmlRequest.send(formData);
+    });
 };
+
 
 export const fetchComplaintFromBackend = async () => {
     try {
@@ -31,6 +59,21 @@ export const fetchComplaintFromBackend = async () => {
         console.error('Erro ao buscar dados:', error);
     }
 };
+
+export const fetchUserByEmail = async (email: string) => {
+    try {
+        const response = await fetch(BASE_URL + '/users/' + email);
+
+        if (!response.ok) {
+            throw new Error('Erro ao buscar usuário por email');
+        }
+
+        const user: User = await response.json();
+        return user;
+    } catch (error) {
+        console.error('Erro ao buscar usuário por email: ', error);
+    }
+}
 
 export const signUpUser = async (user: User) => {
     try {
