@@ -48,6 +48,13 @@ public class UserService {
         return new UserResponseDto(user);
     }
 
+    
+    public UserResponseDto findUserByEmail(String email) throws ResourceNotFoundException {
+        User user = userRepository.findByEmail(email).orElseThrow(ResourceNotFoundException::new);
+
+        return new UserResponseDto(user);
+    }
+
     public void deleteUserById(Integer id) throws ResourceNotFoundException {
         User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
 
@@ -92,4 +99,5 @@ public class UserService {
         Collections.sort(emails);
         return Collections.binarySearch(emails, userRequestDto.getEmail()) > -1;
     }
+
 }

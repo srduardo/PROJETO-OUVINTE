@@ -1,5 +1,8 @@
 package com.ouvinte.backend.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ouvinte.backend.dto.request.ComplaintRequestDto;
 import com.ouvinte.backend.dto.response.ComplaintResponseDto;
 import com.ouvinte.backend.services.ComplaintService;
@@ -29,9 +32,10 @@ public class ComplaintController {
     public ResponseEntity<List<ComplaintResponseDto>> getAllComplaints() {
         return ResponseEntity.ok(complaintService.findAllComplaints());
     }
-
+    @CrossOrigin(origins = "*")
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<ComplaintResponseDto> registerComplaint(@Valid @RequestPart("datas") ComplaintRequestDto complaintRequestDto, @RequestPart("image") MultipartFile image) {
+    public ResponseEntity<ComplaintResponseDto> registerComplaint(@Valid @RequestPart("datas") String datas, @RequestPart("image") MultipartFile image) throws JsonMappingException, JsonProcessingException {
+        ComplaintRequestDto complaintRequestDto = new ObjectMapper().readValue(datas, ComplaintRequestDto.class);
         return ResponseEntity.ok(complaintService.createComplaint(complaintRequestDto, image));
     }
 
