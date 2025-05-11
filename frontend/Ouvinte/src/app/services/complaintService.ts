@@ -1,8 +1,6 @@
-import { useCallback } from "react";
 import { LocationObject, LocationObjectCoords } from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ComplaintResponse } from "../types/ComplaintResponse";
-import { ComplaintRequest } from "../types/ComplaintRequest";
 import { ComplaintMap } from "../types/ComplaintMap";
 
 export const getComplaintLocation = (complaint: ComplaintResponse): LocationObject => {

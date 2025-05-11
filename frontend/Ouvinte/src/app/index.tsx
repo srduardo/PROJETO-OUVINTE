@@ -3,9 +3,7 @@ import { styles } from '../../constants/styles';
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
 import { User } from './types/User';
-import { signInUser, fetchUserByEmail } from './services/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { signInUser } from './services/api';
 
 export default function Login() {
 
@@ -13,7 +11,6 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
 
   async function handleSignIn() {
     if (email === "" || password === "") {

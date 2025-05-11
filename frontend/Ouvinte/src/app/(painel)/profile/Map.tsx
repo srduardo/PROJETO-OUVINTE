@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import {
     requestForegroundPermissionsAsync,
@@ -10,14 +10,12 @@ import {
 } from 'expo-location';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { styles } from '../../../../constants/styles';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ComplaintResponse } from '../../types/ComplaintResponse';
 import { useWebSocket } from '../../services/webSocketService';
-import { sortRoutes } from 'expo-router/build/sortRoutes';
 import { getComplaintLocation, filterComplaints, storeComplaintsLocally, removeDeletedComplaints, updateComplaints } from '../../services/complaintService';
 import { useFocusEffect } from 'expo-router';
-import { ComplaintRequest } from '../../types/ComplaintRequest';
 import { ComplaintMap } from '../../types/ComplaintMap';
 
 
@@ -47,7 +45,8 @@ export default function Profile() {
             id: c.id, 
             title: c.title, 
             description: c.description, 
-            type: c.type, 
+            type: c.type,
+            image: c.image,
             votes: c.votes, 
             latitude: c.latitude, 
             longitude: c.longitude, 
@@ -77,7 +76,6 @@ export default function Profile() {
     };
 
     // Use's
-
     useFocusEffect(
         React.useCallback(() => {
             const {close} = useWebSocket(handleComplaint);
@@ -88,11 +86,6 @@ export default function Profile() {
           };
         }, [])
       );
-    
-    
-    // useEffect(() => {
-    //     requestLocationPermission();
-    // }, []);
 
     useEffect(() => {
         watchPositionAsync({
@@ -135,10 +128,9 @@ export default function Profile() {
 
                     { complaints.filter((c1) => c1.location && c1.location.coords).map((c2) => {
                         return (
-                            <Marker key={c2.id} coordinate={{latitude: c2.location.coords.latitude, longitude: c2.location.coords.longitude}} title={c2.title} icon={require('../../../../assets/img/complaint-pin.png')}/>
+                            <Marker key={c2.id} coordinate={{latitude: c2.location.coords.latitude, longitude: c2.location.coords.longitude}} title={c2.title} icon={require('../../../../assets/img/complaint-pin.png')} onPress={() => router.push(`/(painel)/profile/VisualizarDenuncia/${c2.id}`)}/>
                         );
                     })
-
                     }
 
                 </MapView>

@@ -1,5 +1,3 @@
-import { LocationObject } from "expo-location";
-
 export type ComplaintRequest = {
     title: string,
     description: string,

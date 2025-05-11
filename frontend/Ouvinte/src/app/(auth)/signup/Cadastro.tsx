@@ -1,11 +1,9 @@
-import { Alert, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
 import { styles } from '../../../../constants/styles';
 import React, { useState } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { supabase } from '../../../lib/supabase';
 import { router } from 'expo-router';
 import { User } from '../../types/User';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { signUpUser } from '../../services/api';
 
 

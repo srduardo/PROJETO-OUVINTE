@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User } from "../types/User";
 import { ComplaintRequest } from "../types/ComplaintRequest";
 import { ImageFile } from "../types/ImageFile";
+import { ComplaintMap } from "../types/ComplaintMap";
 
 const BASE_URL = 'http://192.168.18.3:8080/api';
 
@@ -46,17 +47,31 @@ export const registerComplaint = async (complaint: ComplaintRequest, image: Imag
     });
 };
 
-
-export const fetchComplaintFromBackend = async () => {
+export const fetchComplaintFromBackend = async (id: string): Promise<ComplaintMap>  => {
     try {
-        const response = await fetch(BASE_URL + '/complaints');
+        const token = await AsyncStorage.getItem('jwt');
+        console.log('Token: ', token);
+        console.log('ID: ', id);
+
+        const response = await fetch(`${BASE_URL}/complaints/${id}`, {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+        });
+
         if (!response.ok) {
+            const message = await response.text();
+            console.log("Erro na API: ", message);
             throw new Error('Erro ao buscar dados do back-end');
         }
-        const complaints = await response.json();
-        return complaints;
+
+        console.log('Status:', response.status);
+        const complaint: ComplaintMap = await response.json();
+        console.log(complaint);
+
+        return complaint;
     } catch (error) {
         console.error('Erro ao buscar dados:', error);
+        return null;
     }
 };
 

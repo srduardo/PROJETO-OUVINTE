@@ -13,7 +13,6 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
 import { styles } from '../../../../constants/styles';
-import { saveDataLocally } from '../../services/storageService';
 import { registerComplaint } from '../../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LocationObject } from 'expo-location';
