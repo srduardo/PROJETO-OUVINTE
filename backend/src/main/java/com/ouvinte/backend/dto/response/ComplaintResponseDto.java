@@ -1,6 +1,8 @@
 package com.ouvinte.backend.dto.response;
 
 import com.ouvinte.backend.domain.Complaint;
+import com.ouvinte.backend.domain.Image;
+
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -11,6 +13,7 @@ public class ComplaintResponseDto {
     private String title;
     private String description;
     private String type;
+    private Image image;
     private double longitude;
     private double latitude;
     private LocalDateTime duration;
@@ -22,6 +25,7 @@ public class ComplaintResponseDto {
         this.title = complaint.getTitle();
         this.description = complaint.getDescription();
         this.type = complaint.getType();
+        this.image = complaint.getImage();
         this.longitude = complaint.getLongitude();
         this.latitude = complaint.getLatitude();
         this.duration = complaint.getDuration();

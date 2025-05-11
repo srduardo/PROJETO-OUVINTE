@@ -1,6 +1,7 @@
 package com.ouvinte.backend.services;
 
 import com.ouvinte.backend.domain.Complaint;
+import com.ouvinte.backend.domain.Image;
 import com.ouvinte.backend.dto.request.ComplaintRequestDto;
 import com.ouvinte.backend.dto.response.ComplaintResponseDto;
 import com.ouvinte.backend.exceptions.ResourceNotFoundException;
@@ -20,6 +21,9 @@ public class ComplaintService {
     @Autowired
     private ComplaintRepository complaintRepository;
 
+    @Autowired
+    private ImageService imageService;
+
     public List<ComplaintResponseDto> findAllComplaints() {
         return complaintRepository
                 .findAll()
@@ -36,20 +40,22 @@ public class ComplaintService {
     }
 
     public ComplaintResponseDto createComplaint(ComplaintRequestDto complaintRequestDto, MultipartFile image) {
-        if (image.isEmpty() || complaintRequestDto == null) {
+        if (complaintRequestDto == null || image == null || image.isEmpty()) {
             throw new IllegalArgumentException("Dados não recebidos!");
         }
 
         try {
-            Complaint complaint = new Complaint(complaintRequestDto);
-            complaint.setImage(image.getBytes());
-            complaint.setDuration(LocalDateTime.now().plusDays(30));
-
-            complaintRepository.save(complaint);
-
+            Image imageToStore = imageService.uploadImage(image);
+            
+            Complaint complaint = new Complaint(complaintRequestDto, imageToStore, LocalDateTime.now().plusDays(30));            
+            Complaint storedComplaint = complaintRepository.save(complaint);
+            
+            imageToStore.setComplaint(storedComplaint);
+            imageService.saveImage(imageToStore);
+            
             return new ComplaintResponseDto(complaint);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Não foi possível processar a denúncia!");
+            throw new RuntimeException("Erro ao criar denúncia: " + e.getMessage());
         }
     }
 

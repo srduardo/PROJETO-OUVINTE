@@ -1,5 +1,6 @@
 package com.ouvinte.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ouvinte.backend.dto.request.ComplaintRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,24 +21,28 @@ public class Complaint implements Comparable<Complaint> {
     private String title;
     private String description;
     private String type;
-    private byte[] image;
     private double longitude;
     private double latitude;
     private LocalDateTime duration;
     private int votes;
+    @OneToOne(mappedBy = "complaint", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private Image image;
 
     @Override
     public int compareTo(Complaint o) {
         return this.getTitle().compareTo(o.getTitle());
     }
 
-    public Complaint(ComplaintRequestDto complaintRequestDto) {
+    public Complaint(ComplaintRequestDto complaintRequestDto, Image image, LocalDateTime duration) {
         this.title = complaintRequestDto.getTitle();
         this.description = complaintRequestDto.getDescription();
         this.type = complaintRequestDto.getType();
         this.longitude = complaintRequestDto.getLongitude();
         this.latitude = complaintRequestDto.getLatitude();
         this.votes = complaintRequestDto.getVotes();
+        this.image = image;
+        this.duration = duration;
     }
 }
 
