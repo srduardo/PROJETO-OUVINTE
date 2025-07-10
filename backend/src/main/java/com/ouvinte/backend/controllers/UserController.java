@@ -26,9 +26,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserRequestDto> registerUser(@Valid @RequestBody UserRequestDto userRequestDto) {
-        userService.registerUser(userRequestDto);
-        return ResponseEntity.status(201).body(userRequestDto);
+    public ResponseEntity<UserResponseDto> registerUser(@Valid @RequestBody UserRequestDto userRequestDto) {
+        return ResponseEntity.status(201).body(userService.registerUser(userRequestDto));
     }
 
     // CRUD endpoints:
@@ -40,7 +39,7 @@ public class UserController {
 
     @GetMapping("/{email}")
     public ResponseEntity<UserResponseDto> getUserByEmail(@PathVariable String email) {
-        return ResponseEntity.ok(userService.findUserByEmail(email));
+        return ResponseEntity.ok(userService.findUserResponseByEmail(email));
     }
 
     @GetMapping
@@ -59,5 +58,9 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable Integer id, @Valid @RequestBody UserRequestDto userRequestDto){
         return ResponseEntity.ok(userService.updateUserById(id, userRequestDto));
+    }
+    @PutMapping("/updatePassword/{email}")
+    public ResponseEntity<UserResponseDto> updateUserPassword(@PathVariable String email, @Valid @RequestBody UserRequestDto userRequestDto){
+        return ResponseEntity.ok(userService.updateUserPasswordByEmail(email, userRequestDto));
     }
 }

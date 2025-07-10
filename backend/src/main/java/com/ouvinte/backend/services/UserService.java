@@ -7,6 +7,7 @@ import com.ouvinte.backend.exceptions.InvalidCredentialsException;
 import com.ouvinte.backend.exceptions.ResourceNotFoundException;
 import com.ouvinte.backend.repositories.UserRepository;
 import com.ouvinte.backend.services.security.JwtService;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collections;
 import java.util.List;
@@ -49,10 +52,14 @@ public class UserService {
     }
 
     
-    public UserResponseDto findUserByEmail(String email) throws ResourceNotFoundException {
+    public UserResponseDto findUserResponseByEmail(String email) throws ResourceNotFoundException {
         User user = userRepository.findByEmail(email).orElseThrow(ResourceNotFoundException::new);
 
         return new UserResponseDto(user);
+    }
+    
+    public User findUserByEmail(String email) throws ResourceNotFoundException {
+        return userRepository.findByEmail(email).orElseThrow(ResourceNotFoundException::new);
     }
 
     public void deleteUserById(Integer id) throws ResourceNotFoundException {
@@ -71,6 +78,14 @@ public class UserService {
         return new UserResponseDto(updatedUser);
     }
 
+    public UserResponseDto updateUserPasswordByEmail(String email, UserRequestDto userRequestDto) throws ResourceNotFoundException {
+        User updatedUser = userRepository.findByEmail(email).orElseThrow(ResourceNotFoundException::new);
+        updatedUser.setPassword(encoderPassword.encode(userRequestDto.getPassword()));
+        userRepository.save(updatedUser);
+
+        return new UserResponseDto(updatedUser);
+    }
+
     // Authentication operations:
 
     public String verify(UserRequestDto userRequestDto) throws BadCredentialsException {
@@ -84,7 +99,7 @@ public class UserService {
         return jwtService.generateToken(userRequestDto.getEmail());
     }
 
-    public void registerUser(UserRequestDto userRequestDto) throws RuntimeException{
+    public UserResponseDto registerUser(UserRequestDto userRequestDto) throws RuntimeException{
         if (userRequestDto == null || verifyIfEmailUserExists(userRepository.findAllUserEmails(), userRequestDto)) {
             throw new InvalidCredentialsException();
         }
@@ -92,12 +107,22 @@ public class UserService {
         User user = new User();
         BeanUtils.copyProperties(userRequestDto, user);
         user.setPassword(encoderPassword.encode(user.getPassword())); // Define a senha encriptada no usuário
-        userRepository.save(user);
+        User storedUser = userRepository.save(user);
+
+        return new UserResponseDto(storedUser);
     }
 
     public boolean verifyIfEmailUserExists(List<String> emails, UserRequestDto userRequestDto) {
         Collections.sort(emails);
         return Collections.binarySearch(emails, userRequestDto.getEmail()) > -1;
+    }
+
+    public UserDetails getUserEmailFromSecurityContext() {
+        if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
+            return (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        }
+
+        return null;
     }
 
 }

@@ -1,9 +1,23 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-  img: {
-    width: 200,
-    height: 200
+  // img: {
+  //   width: 200,
+  //   height: 200
+  // },
+
+  listContainer: {
+    flex: 1,
+    backgroundColor: '#E5E1E1',
+    padding: 20,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+
   },
 
   fullImage: {
@@ -32,36 +46,72 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
 
-  formInput: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#A7E7BD',
-    borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: 28,
     fontSize: 16,
-    width: '80%',
-    padding: 10,
-    margin: 10
+    width: '100%',
+    padding: 6,
+    marginVertical: 10
   },
 
   formButton: {
-    backgroundColor: '#A7E7BD',
+    backgroundColor: '#56DD84',
     borderWidth: 1,
-    borderRadius: 14,
-    width: '40%',
+    borderRadius: 30,
+    width: 210,
     padding: 10,
     margin: 10,
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: '10%'
+  },
+  formButtonRemoveVote: {
+    backgroundColor: 'red',
+    borderWidth: 1,
+    borderRadius: 30,
+    width: 'auto',
+    padding: 10,
+    margin: 10,
+    alignItems: 'center',
+    marginTop: '10%'
   },
 
   textButton: {
     fontSize: 24,
-    color: 'black'
+    color: 'black',
+    fontWeight: 'bold'
+  },
+  textButtonRemoveVote: {
+    fontSize: 24,
+    color: 'white',
+    fontWeight: 'bold'
   },
 
   subContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '80%',
-    paddingBlockEnd: 10
+  },
+  subContainerr: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+
+  linesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+
+  line: {
+    width: '45%',
+    height: 1,
+    backgroundColor: 'black',
+    marginTop: 10
   },
 
   subText: {
@@ -119,7 +169,9 @@ export const styles = StyleSheet.create({
   },
 
   navBar: {
-    backgroundColor: '#A7E7BD',
+    position: 'absolute',
+    bottom: 10,
+    backgroundColor: '#56DD84',
     borderWidth: 1,
     borderRadius: 14,
     fontSize: 16,
@@ -142,13 +194,18 @@ export const styles = StyleSheet.create({
     color: 'black'
   },
 
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#A8E6A1',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginVertical: 10
+  // inputContainer: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   backgroundColor: '#A8E6A1',
+  //   borderRadius: 10,
+  //   paddingHorizontal: 10,
+  //   marginVertical: 10
+  // },
+
+  formInput: {
+    flex: 1,
+    marginLeft: 5
   },
 
   textContainer: {
@@ -156,9 +213,9 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     flexWrap: 'wrap',
     backgroundColor: '#D0D0D0',
-    borderRadius: 10,
+    borderRadius: 28,
     paddingHorizontal: 10,
-    marginVertical: 10,
+    marginVertical: 8,
     justifyContent: 'space-between',
   },
 
@@ -174,7 +231,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     flexWrap: 'wrap',
     backgroundColor: '#BFBEBE',
-    borderRadius: 10,
+    borderRadius: 28,
     paddingHorizontal: 10,
     marginVertical: 10,
     height: 50
@@ -200,9 +257,10 @@ export const styles = StyleSheet.create({
   },
 
   uploadButton: {
-    backgroundColor: '#A8E6A1',
-    borderRadius: 10,
-    height: 100,
+    backgroundColor: '#A7E7BD',
+    borderRadius: 28,
+    width: '100%',
+    height: 150,
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 10
@@ -217,10 +275,35 @@ export const styles = StyleSheet.create({
   tipoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     backgroundColor: '#C4C4C4',
-    borderRadius: 10,
+    borderRadius: 28,
     paddingHorizontal: 10,
+    width: '100%',
+    height: 50,
+    marginVertical: 10
+  },
+
+  complainsTypeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#56DD84',
+    borderRadius: 28,
+    paddingHorizontal: 10,
+    width: '100%',
+    height: 50,
+    marginVertical: 10
+  },
+
+  allComplaintsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'red',
+    borderRadius: 28,
+    paddingHorizontal: 10,
+    width: '100%',
     height: 50,
     marginVertical: 10
   },
@@ -228,6 +311,18 @@ export const styles = StyleSheet.create({
   tipoText: {
     fontSize: 16,
     color: 'black'
+  },
+
+  typeText: {
+    fontSize: 16,
+    color: 'black',
+    fontWeight: 'bold'
+  },
+
+  typeTextAll: {
+    fontSize: 16,
+    color: 'white',
+    fontWeight: 'bold'
   },
 
   modalContainer: {

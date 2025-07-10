@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Modal, FlatList, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import {
     requestForegroundPermissionsAsync,
@@ -23,7 +23,17 @@ export default function Profile() {
     const [location, setLocation] = useState<LocationObject | null>(null);
     const mapRef = useRef<MapView | null>(null);
     const [complaints, setComplaints] = useState<ComplaintMap[]>([]);
-    
+    const [allComplaints, setAllComplaints] = useState<ComplaintMap[]>([]);
+    const [filteredComplaints, setFilteredComplaints] = useState<ComplaintMap[]>([]);
+    const [viewList, setViewList] = useState(false);
+    const tipos = [
+        'Buraco na pista',
+        'Acidente',
+        'Alagamento',
+        'Rede elétrica',
+        'Área abandonada',
+    ];
+
     // Localização
     async function requestLocationPermission() {
         const { granted } = await requestForegroundPermissionsAsync();
@@ -37,20 +47,21 @@ export default function Profile() {
     }
 
     // Manipulação de denúncias
-    const handleComplaint = useCallback(async (complaintsFromBack: string)=> {
+    const handleComplaint = useCallback(async (complaintsFromBack: string) => {
         const complaintsResponse: ComplaintResponse[] = JSON.parse(complaintsFromBack);
         const stored = await AsyncStorage.getItem('complaints');
 
         const complaintsMap: ComplaintMap[] = complaintsResponse.map((c) => ({
-            id: c.id, 
-            title: c.title, 
-            description: c.description, 
+            id: c.id,
+            title: c.title,
+            description: c.description,
             type: c.type,
             image: c.image,
-            votes: c.votes, 
-            latitude: c.latitude, 
-            longitude: c.longitude, 
-            location: getComplaintLocation(c)
+            votes: c.votes,
+            latitude: c.latitude,
+            longitude: c.longitude,
+            location: getComplaintLocation(c),
+            isVoted: false
         }))
 
         if (!stored) {
@@ -58,15 +69,15 @@ export default function Profile() {
             console.log('Primeiras denúncias registradas!');
             return;
         }
-    
+
         const jsonStoredComplaints: ComplaintMap[] = JSON.parse(stored);
         const [newComplaints, deletedComplaints] = filterComplaints(jsonStoredComplaints, complaintsMap);
         const nonDeletedCompalints: ComplaintMap[] = removeDeletedComplaints(deletedComplaints, jsonStoredComplaints);
-        
+
         updateComplaints(newComplaints, nonDeletedCompalints);
     }, []);
-        
-    const loadStoredComplaints = async () =>  {
+
+    const loadStoredComplaints = async () => {
         const stored = await AsyncStorage.getItem('complaints');
         if (stored) {
             const jsonComplaints: ComplaintMap[] = JSON.parse(stored);
@@ -75,17 +86,26 @@ export default function Profile() {
         }
     };
 
+    const filterComplaintsByType = async (type: string) => {
+        const stored = await AsyncStorage.getItem('complaints');
+        if (stored) {
+            const jsonComplaints: ComplaintMap[] = JSON.parse(stored);
+            const filtered: ComplaintMap[] = jsonComplaints.filter((c) => c.type === type);
+            setComplaints(filtered);
+        }
+    };
+
     // Use's
     useFocusEffect(
         React.useCallback(() => {
-            const {close} = useWebSocket(handleComplaint);
+            const { close } = useWebSocket(handleComplaint);
             loadStoredComplaints();
             requestLocationPermission();
             return () => {
                 close();
-          };
+            };
         }, [])
-      );
+    );
 
     useEffect(() => {
         watchPositionAsync({
@@ -126,9 +146,9 @@ export default function Profile() {
                         icon={require('../../../../assets/img/user-pin.png')}
                     />
 
-                    { complaints.filter((c1) => c1.location && c1.location.coords).map((c2) => {
+                    {complaints.filter((c1) => c1.location && c1.location.coords).map((c2) => {
                         return (
-                            <Marker key={c2.id} coordinate={{latitude: c2.location.coords.latitude, longitude: c2.location.coords.longitude}} title={c2.title} icon={require('../../../../assets/img/complaint-pin.png')} onPress={() => router.push(`/(painel)/profile/VisualizarDenuncia/${c2.id}`)}/>
+                            <Marker key={c2.id} coordinate={{ latitude: c2.location.coords.latitude, longitude: c2.location.coords.longitude }} title={c2.title} icon={require('../../../../assets/img/complaint-pin.png')} onPress={() => router.push(`/(painel)/profile/VisualizarDenuncia/${c2.id}`)} />
                         );
                     })
                     }
@@ -136,10 +156,43 @@ export default function Profile() {
                 </MapView>
             )}
 
+            {viewList && (
+                <View style={{ position: 'absolute', top: '20%', alignSelf: 'center', justifyContent: 'center', padding: 20, backgroundColor: '#E5E1E1', borderRadius: 10 }}>
+                    <Text style={{ fontSize: 26, marginHorizontal: 'auto', fontWeight: 'bold', marginVertical: 5 }}>FILTRO</Text>
+                    <FlatList
+                        data={tipos}
+                        keyExtractor={(item) => item}
+                        renderItem={({ item }) => (
+
+                            <View>
+                                <TouchableOpacity onPress={() => {
+                                    setViewList(false);
+                                    filterComplaintsByType(item);
+                                }}>
+                                    <View style={styles.complainsTypeButton}>
+                                        <Text style={styles.typeText}>{item}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        )} />
+
+                    <TouchableOpacity onPress={() => {
+                        setViewList(false);
+                        loadStoredComplaints();
+                    }}>
+                        <View style={styles.allComplaintsButton}>
+                            <Text style={styles.typeTextAll}>TODAS</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+
+
+            )}
+
             <View style={styles.navBar}>
                 <View style={styles.buttonContainer}>
 
-                    <TouchableOpacity onPress={() => router.push('/(painel)/profile/home')}>
+                    <TouchableOpacity onPress={() => setViewList(!viewList)}>
                         <Icon name="filter" size={24} color="black" />
                     </TouchableOpacity>
 
@@ -148,7 +201,7 @@ export default function Profile() {
                         <Icon name="pluscircleo" size={24} color="black" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => router.push('/')}>
+                    <TouchableOpacity onPress={() => router.replace('/')}>
                         <Icon name="logout" size={24} color="black" />
                     </TouchableOpacity>
                 </View>

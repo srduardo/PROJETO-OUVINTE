@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ouvinte.backend.dto.request.ComplaintRequestDto;
 import com.ouvinte.backend.dto.response.ComplaintResponseDto;
 import com.ouvinte.backend.services.ComplaintService;
+import com.ouvinte.backend.services.VoteService;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +23,14 @@ public class ComplaintController {
     @Autowired
     private ComplaintService complaintService;
 
+    @Autowired
+    private VoteService voteService;
+
     // CRUD endpoints:
 
     @GetMapping("/{id}")
     public ResponseEntity<ComplaintResponseDto> getComplaint(@PathVariable Integer id) {
-        return ResponseEntity.ok(complaintService.findComplaintById(id));
+        return ResponseEntity.ok(complaintService.findComplaintResponseById(id));
     }
 
     @GetMapping
@@ -47,5 +52,10 @@ public class ComplaintController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ComplaintResponseDto> deleteComplaint(@PathVariable Integer id) {
         return ResponseEntity.ok(complaintService.deleteComplaint(id));
+    }
+
+    @PutMapping("/voteComplaint/{id}")
+    public ResponseEntity<Boolean> voteComplaint(@PathVariable Integer id) {
+        return ResponseEntity.ok(voteService.voteComplaint(id));
     }
 }

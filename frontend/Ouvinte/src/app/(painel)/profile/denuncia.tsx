@@ -52,7 +52,7 @@ export default function Denuncia() {
       const imageFile: ImageFile = {
         uri: uri,
         name: filename,
-        type: mimeType  
+        type: mimeType
       }
 
       setImagem(imageFile);
@@ -62,15 +62,15 @@ export default function Denuncia() {
 
   const handleDenunciar = async () => {
     if (!nomeDenuncia || !descricaoDenuncia || tipoDenuncia === 'Selecione o tipo' || !imagem) {
-      Alert.alert('Erro', 'Preencha todos os campos antes de enviar a denúncia.');
+      Alert.alert('Dados inválidos', 'Por favor, preencha todos os campos antes de enviar a denúncia.');
       return;
     }
-    
+
     const stringUserLocation: string = await AsyncStorage.getItem('userLocation');
     const userLocation: LocationObject = JSON.parse(stringUserLocation);
 
     console.log('Localização do usuário: ', userLocation);
-    
+
     const data: ComplaintRequest = {
       title: nomeDenuncia,
       description: descricaoDenuncia,
@@ -79,21 +79,22 @@ export default function Denuncia() {
       latitude: userLocation.coords.latitude,
       votes: 1
     }
-    
+
     registerComplaint(data, imagem);
-    
+
     Alert.alert('Denúncia enviada!', 'Sua denúncia foi registrada com sucesso.');
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView style={{ flex: 1, backgroundColor: '#F5EDED' }}>
-        <View style={styles.container1}>
-          <Text style={styles.title1}>Criando Denuncia</Text>
+      <ScrollView style={{ flex: 1, backgroundColor: '#E5E1E1', padding: 20 }}>
+        <View style={styles.container}>
+          <Text style={{ fontSize: 60, fontWeight: 'bold', marginRight: '45%', marginTop: '5%' }}>Criando</Text>
+          <Text style={{ fontSize: 60, fontWeight: 'bold', marginLeft: '16%', marginBottom: '5%' }}>Denúncia!</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={styles.formInput}
               placeholder="Nome da denúncia"
               value={nomeDenuncia}
               onChangeText={setNomeDenuncia}
@@ -104,7 +105,7 @@ export default function Denuncia() {
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[styles.formInput, styles.textArea]}
               placeholder="Descrição da denúncia"
               value={descricaoDenuncia}
               onChangeText={setDescricaoDenuncia}
@@ -152,8 +153,8 @@ export default function Denuncia() {
             </View>
           </Modal>
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleDenunciar}>
-            <Text style={styles.submitText}>Denunciar</Text>
+          <TouchableOpacity style={styles.formButton} onPress={handleDenunciar}>
+            <Text style={styles.textButton}>Denunciar</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

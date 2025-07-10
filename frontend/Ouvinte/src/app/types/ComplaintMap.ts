@@ -11,4 +11,5 @@ export type ComplaintMap = {
     latitude: number,
     longitude: number,
     location: LocationObject
+    isVoted: boolean | null
 };

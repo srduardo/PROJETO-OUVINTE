@@ -28,14 +28,20 @@ public class ComplaintService {
         return complaintRepository
                 .findAll()
                 .stream()
-                .map(ComplaintResponseDto::new)
+                .map(complaint -> new ComplaintResponseDto(complaint, false))
                 .toList();
     }
 
-    public ComplaintResponseDto findComplaintById(Integer id) {
+    public ComplaintResponseDto findComplaintResponseById(Integer id) {
         return complaintRepository
                 .findById(id)
-                .map(ComplaintResponseDto::new)
+                .map(complaint -> new ComplaintResponseDto(complaint, false))
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public Complaint findComplaintById(Integer id) {
+        return complaintRepository
+                .findById(id)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
@@ -53,7 +59,7 @@ public class ComplaintService {
             imageToStore.setComplaint(storedComplaint);
             imageService.saveImage(imageToStore);
             
-            return new ComplaintResponseDto(complaint);
+            return new ComplaintResponseDto(complaint, false);
         } catch (Exception e) {
             throw new RuntimeException("Erro ao criar denúncia: " + e.getMessage());
         }
@@ -64,13 +70,18 @@ public class ComplaintService {
         BeanUtils.copyProperties(complaintRequestDto, updatedComplaint);
         complaintRepository.save(updatedComplaint);
 
-        return new ComplaintResponseDto(updatedComplaint);
+        return new ComplaintResponseDto(updatedComplaint, false);
     }
 
     public ComplaintResponseDto deleteComplaint(Integer id) {
         Complaint complaint = this.complaintRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        ComplaintResponseDto complaintResponseDto = new ComplaintResponseDto(complaint);
+        ComplaintResponseDto complaintResponseDto = new ComplaintResponseDto(complaint, false);
         this.complaintRepository.delete(complaint);
         return complaintResponseDto;
     }
+
+    public Complaint saveComplaint(Complaint complaint) {
+        return complaintRepository.save(complaint);
+    }
+
 }

@@ -18,9 +18,10 @@ public class ComplaintResponseDto {
     private double latitude;
     private LocalDateTime duration;
     private int votes;
+    private boolean isVoted;
 
 
-    public ComplaintResponseDto(Complaint complaint) {
+    public ComplaintResponseDto(Complaint complaint, boolean isVoted) {
         this.id = complaint.getId();
         this.title = complaint.getTitle();
         this.description = complaint.getDescription();
@@ -30,5 +31,6 @@ public class ComplaintResponseDto {
         this.latitude = complaint.getLatitude();
         this.duration = complaint.getDuration();
         this.votes = complaint.getVotes();
+        this.isVoted = isVoted;
     }
 }

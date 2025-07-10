@@ -1,4 +1,4 @@
-const WEBSOCKET_URL = 'ws://192.168.18.3:8080/ws';
+const WEBSOCKET_URL = 'ws://172.20.10.5:8080/ws';
 
 export const useWebSocket = (handleComplaint: (message: string) => void) => {
     const socket = new WebSocket(WEBSOCKET_URL);
